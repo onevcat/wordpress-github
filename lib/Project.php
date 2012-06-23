@@ -157,7 +157,28 @@ class WPGH_Project
 
             $projects[] = $proj;
         }
+        
+        $url  = "https://api.github.com/users/$username/watched";
+        $json = WPGH_Net::get($url);
+       
+        if(!is_array($json = json_decode($json)))
+            return FALSE;
 
+        foreach($json as $repo)
+        {
+            $proj = new WPGH_Project;
+            $proj->url = $repo->html_url;
+            $proj->name = $repo->name;
+            $proj->description = $repo->description;
+            $proj->watchers = $repo->watchers;
+            $proj->source = "GitHub";
+            $proj->watcher_noun = ($repo->watchers == 1 ? 'watcher' : 'watchers');
+            $proj->updated = strtotime($repo->pushed_at);
+
+            $projects[] = $proj;
+        }
+        
+        
         return $projects;
     }
 
